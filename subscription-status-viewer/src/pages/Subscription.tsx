@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { generateClient } from "aws-amplify/data";
 import type { Schema } from "../../amplify/data/resource";
 import { getCurrentUser } from "aws-amplify/auth";
+import SubscriptionItem from "../components/SubscriptionItem";
 
 const client = generateClient<Schema>();
 
@@ -70,47 +71,9 @@ export default function Subscription() {
   if (!subscriptions.length) return <p>No subscriptions found</p>;
 
   return (
-  <div>
-    <h2>Your Subscriptions</h2>
-    {subscriptions.map((sub) => (
-      <div
-        key={sub.id}
-        style={{
-          border: "1px solid #ddd",
-          padding: 12,
-          marginBottom: 10,
-          borderRadius: 6,
-        }}
-      >
-        <p>
-          <strong>ID:</strong> {sub.id}
-        </p>
-        <p>
-          <strong>Status:</strong>{" "}
-          <span
-            style={{
-              color: sub.status === "active" ? "green" : "orange",
-            }}
-          >
-            {sub.status}
-          </span>
-        </p>
-        <p>
-          <strong>Products:</strong>
-        </p>
-        <ul>
-          {sub.items.map((productId) => (
-            <li key={productId}>{productId}</li>
-          ))}
-        </ul>
-        <p>
-          <strong>Renewal date:</strong>{" "}
-          {sub.renewalDate
-            ? new Date(sub.renewalDate).toLocaleDateString()
-            : "N/A"}
-        </p>
-      </div>
-    ))}
-  </div>
-);
+    <div>
+        <h2>Your Subscriptions</h2>
+        <SubscriptionItem subscriptions={subscriptions} />
+    </div>
+    );
 }
