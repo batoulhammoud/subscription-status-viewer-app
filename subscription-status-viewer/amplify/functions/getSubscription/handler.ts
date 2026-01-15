@@ -1,76 +1,50 @@
-import Stripe from "stripe";
-import {
-  APIGatewayProxyHandler,
-  APIGatewayProxyResult,
-} from "aws-lambda";
+import stripe from 'stripe';
+import type { AppSyncResolverHandler, AppSyncIdentityCognito } from 'aws-lambda';
 
-export const handler: APIGatewayProxyHandler = async (
-  event
-): Promise<APIGatewayProxyResult> => {
+// Define the shape of the data we expect to return
+
+
+
+export const handler: AppSyncResolverHandler<any, any> = async (event) => {
   try {
-    /* 1️⃣ Get user identity from JWT (Cognito) */
-    const claims =
-      event.requestContext.authorizer?.jwt?.claims;
-
-    const userId =
-      claims?.sub ||
-      event.requestContext.authorizer?.claims?.sub;
-
+    // 1. Cast the identity to Cognito to access 'sub' and 'claims'
+    const identity = event.identity as AppSyncIdentityCognito;
+    const userId = identity?.sub;
+    
     if (!userId) {
-      return {
-        statusCode: 401,
-        body: JSON.stringify({
-          message: "Unauthorized: No user identity found",
-        }),
-      };
+      throw new Error('Unauthorized: No user identity found');
     }
 
-    /* 2️⃣ Map user → stripe customer */
-    const stripeCustomerId =
-      process.env.STRIPE_CUSTOMER_ID!;
+    // --- MAPPING LOGIC ---
+    const stripeCustomerId = process.env.STRIPE_CUSTOMER_ID!; 
 
-    /* 3️⃣ Init Stripe */
-    const stripeClient = new Stripe(
-      process.env.STRIPE_SECRET_KEY!,
-      {
-        apiVersion: "2023-10-16",
-      }
-    );
+    // 2. Initialize Stripe
+    // Note: It's best practice to use environment variables for keys!
+    const stripeClient = new stripe(process.env.STRIPE_SECRET_KEY!);
 
-    /* 4️⃣ Fetch subscriptions */
-    const subscriptions =
-      await stripeClient.subscriptions.list({
-        customer: stripeCustomerId,
-        status: "active",
-      });
+    // 3. Fetch subscriptions
+    const subscriptions = await stripeClient.subscriptions.list({
+      customer: stripeCustomerId,   
+      status: 'active', //TODO: status can be dynamic based on requirements
+    });
 
-    /* 5️⃣ Return proxy response */
+
+    
+
+    // 4. Return data directly (matching your GraphQL schema expectation)
     return {
-      statusCode: 200,
-      body: JSON.stringify({
-        userId,
-        stripeCustomerId,
-        subscriptions: subscriptions.data.map(
-          (sub) => ({
-            id: sub.id,
-            status: sub.status,
-            items: sub.items.data.map(
-              (item) => item.price.product
-            ),
-          })
-        ),
-      }),
+      userId,
+      stripeCustomerId,
+      subscriptions: subscriptions.data.map(sub => ({
+        id: sub.id,
+        status: sub.status,
+        items: sub.items.data.map(item => item.price.product),
+      })),
     };
+
   } catch (error: any) {
-    console.error("Stripe API error:", error);
-
-    return {
-      statusCode: 500,
-      body: JSON.stringify({
-        message:
-          error.message ||
-          "Failed to fetch subscription status",
-      }),
-    };
+    console.error('Stripe API error:', error);
+    throw new Error(error.message || 'Failed to fetch subscription status');
   }
 };
+
