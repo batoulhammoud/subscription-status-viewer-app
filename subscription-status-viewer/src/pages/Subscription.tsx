@@ -9,19 +9,33 @@ const client = generateClient<Schema>();
 
 /* ---------- Types ---------- */
 
+
+
 export type SubscriptionItem = {
   id: string;
   status: string;
   items: string[];
-  renewalDate?: string;
+  renewalDate?: string | null;
+  amount: number;       // For displaying "Plan Price"
+  currency: string;     // e.g., "USD"
+};
+
+export type Invoice = {
+  id: string;
+  number: string;       // e.g., "INV-0001"
+  date: string;         // ISO date string
+  amount: number;       // Total paid
+  currency: string;
+  status: string;       // "paid", "open", "void"
+  pdfUrl: string | null; // Direct link to receipt
 };
 
 export type ApiResponse = {
   userId: string;
   stripeCustomerId: string;
   subscriptions: SubscriptionItem[];
+  billingHistory: Invoice[]; // New field for the UI table
 };
-
 /* ---------- Component ---------- */
 
 export default function Subscription() {
