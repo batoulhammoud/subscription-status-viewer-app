@@ -28,6 +28,9 @@ A minimal full-stack application to view user subscriptions and billing history 
   - Buttons for **Manage Billing** and **View Billing History**.  
   - Billing history displayed in a table with invoice details and links to receipts.
 
+- **Analytics**  
+  - Track user interactions (viewing subscriptions, clicking “Manage Billing”) with Amplitude.
+
 ---
 
 ## Assumptions
@@ -53,9 +56,6 @@ A minimal full-stack application to view user subscriptions and billing history 
 
 - **Caching / Performance**  
   - Cache product names and invoices to reduce repeated Stripe API calls.  
-
-- **Analytics**  
-  - Track user interactions (viewing subscriptions, clicking “Manage Billing”) with Amplitude or similar.
 
 - **Testing**  
   - Increase unit and integration test coverage
