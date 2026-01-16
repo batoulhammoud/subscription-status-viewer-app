@@ -70,6 +70,12 @@ export default function Subscription() {
 
   if (userLoading || loading) return <p>Loading...</p>;
 
+
+
+
+
+  
+
   /* ---------- Billing Portal ---------- */
 
   async function handleBillingPortal() {
