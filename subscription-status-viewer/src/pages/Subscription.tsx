@@ -72,11 +72,8 @@ export default function Subscription() {
 
 
 
-
-
-  
-
   /* ---------- Billing Portal ---------- */
+
 
   async function handleBillingPortal() {
     try {
@@ -87,17 +84,25 @@ export default function Subscription() {
           {},
           { authMode: "userPool" }
         );
-        
+
       console.log("Billing Portal Result:", result);
 
-      if (!result.data?.url) {
+      // 🔥 Parse response safely
+      const parsed =
+        typeof result.data === "string"
+          ? JSON.parse(result.data)
+          : result.data;
+
+      if (!parsed?.url) {
         throw new Error("No portal URL returned");
       }
 
       // Redirect user to Stripe
-      window.location.href = result.data.url;
+      window.location.href = parsed.url;
     } catch (err: any) {
-      alert(err.message || "Failed to open portal");
+      alert(
+        err.message || "Failed to open billing portal"
+      );
     } finally {
       setPortalLoading(false);
     }
