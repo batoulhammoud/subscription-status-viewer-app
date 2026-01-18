@@ -5,8 +5,15 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { getCurrentUser } from "aws-amplify/auth";
 
+
+export type AppUser = {
+  userId: string;
+  username?: string;
+  email?: string;
+};
+
 type AuthContextType = {
-  user: any;
+  user: AppUser | null;
   loading: boolean;
 };
 
@@ -16,14 +23,21 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadUser() {
       try {
         const currentUser = await getCurrentUser();
-        setUser(currentUser);
+
+        const appUser: AppUser = {
+          userId: currentUser.userId,
+          username: currentUser.username,
+          email: currentUser.signInDetails?.loginId,
+        };
+
+        setUser(appUser);
       } catch {
         setUser(null);
       } finally {
