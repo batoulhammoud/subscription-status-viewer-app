@@ -69,6 +69,9 @@ A minimal full-stack application to view user subscriptions and billing history 
 git clone <repo-url>
 cd subscription-status-viewer
 npm install
+npm run dev
 
 
+```
+When you first open the app, you’ll be prompted to sign in. Select Create Account to register with your email and password. Enter the verification code sent to your inbox to activate your account; once verified, you can sign in directly using your credentials.
 
