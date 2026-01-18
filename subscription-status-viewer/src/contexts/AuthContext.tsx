@@ -15,16 +15,19 @@ export type AppUser = {
 type AuthContextType = {
   user: AppUser | null;
   loading: boolean;
+  authError: string | null;
 };
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
+  authError: null,
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadUser() {
@@ -38,8 +41,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         };
 
         setUser(appUser);
-      } catch {
+        setAuthError(null); // clear previous errors
+      } catch (err: any) {
         setUser(null);
+        setAuthError(
+          err?.message || "Failed to load user. Please check your credentials."
+        );
       } finally {
         setLoading(false);
       }
@@ -49,7 +56,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading }}>
+    <AuthContext.Provider value={{ user, loading, authError }}>
       {children}
     </AuthContext.Provider>
   );
