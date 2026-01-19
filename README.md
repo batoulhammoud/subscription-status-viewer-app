@@ -30,6 +30,7 @@ A minimal full-stack application to view user subscriptions and billing history 
 
 - **Analytics (Stretch Goal)**  
   - Track user interactions (viewing subscriptions, clicking “Manage Billing”) with Amplitude.
+  > Screenshot: Amplitude event stream showing tracked events inside (assets/screenshots/amplitude_events.png)
 
 - **UI Polish (Stretch Goal)** 
   - Added a **“View Billing History”** button that reveals a table populated with **Stripe invoice data**.
